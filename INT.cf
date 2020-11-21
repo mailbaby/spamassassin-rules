@@ -1,0 +1,28 @@
+# spammy networks and uceprotect combined
+header   INTERSERVER_RULE_SPAMMY_NETWORK rbleval:check_rbl('int', 'rblspamassassin.interserver.net.')
+describe INTERSERVER_RULE_SPAMMY_NETWORK In Spammy Network RBL added 3.5 to score
+tflags   INTERSERVER_RULE_SPAMMY_NETWORK net
+score    INTERSERVER_RULE_SPAMMY_NETWORK 3.5
+#end spammynetworks
+
+#main rbl ruleset
+header   INTERSERVER_RULE_SPAMMY_NETWORK rbleval:check_rbl('int', 'rbl.interserver.net.')
+describe INTERSERVER_RULE_SPAMMY_NETWORK IP listed in rbls.interserver.net
+tflags   INTERSERVER_RULE_SPAMMY_NETWORK net
+score    INTERSERVER_RULE_SPAMMY_NETWORK 5.0
+#end
+
+# int domain blocklist
+urirhssub INTERSERVER_RULE_URIBL_RBLINT rbluri.interserver.net. A 127.0.0.2
+body INTERSERVER_RULE_URIBL_RBLINT eval:check_uridnsbl('URIBL_RBLINT')
+describe INTERSERVER_RULE_URIBL_RBLINT Contains a URL listed in the uribl at sigs.interserver.net
+tflags INTERSERVER_RULE_URIBL_RBLINT net
+score INTERSERVER_RULE_URIBL_RBLINT 4.0
+# end int uri
+
+#wl
+header   INTERSERVER_RULE_GOOD_NETWORK rbleval:check_rbl('int', 'goodrbl.interserver.net.')
+describe INTERSERVER_RULE_GOOD_NETWORK Good or wellknown network decrease score by 2.1
+tflags   INTERSERVER_RULE_GOOD_NETWORK net
+score    INTERSERVER_RULE_GOOD_NETWORK -2.1
+#end wl
