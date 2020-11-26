@@ -1,4 +1,6 @@
 # spammy networks and uceprotect combined
+# this list contains more ips as well as uceprotect1 and networks sending many high spam score emails
+# this should be used to increase spam score, but not completely block spam.
 header   INTERSERVER_RULE_SPAMMY_NETWORK rbleval:check_rbl('int', 'rblspamassassin.interserver.net.')
 describe INTERSERVER_RULE_SPAMMY_NETWORK In Spammy Network RBL added 3.5 to score
 tflags   INTERSERVER_RULE_SPAMMY_NETWORK net
@@ -6,6 +8,9 @@ score    INTERSERVER_RULE_SPAMMY_NETWORK 3.5
 #end spammynetworks
 
 #main rbl ruleset
+# this contains spam, brute force, and other known bad ips
+# delistings are automatic after no abuse for 5 days
+# this should have a higher weight
 header   INTERSERVER_RULE_SPAMMY_NETWORK rbleval:check_rbl('int', 'rbl.interserver.net.')
 describe INTERSERVER_RULE_SPAMMY_NETWORK IP listed in rbls.interserver.net
 tflags   INTERSERVER_RULE_SPAMMY_NETWORK net
@@ -13,6 +18,8 @@ score    INTERSERVER_RULE_SPAMMY_NETWORK 5.0
 #end
 
 # int domain blocklist
+# domain blacklist of spam / phishing
+# delistings are automatic. no domain will be blocked forver
 urirhssub INTERSERVER_RULE_URIBL_RBLINT rbluri.interserver.net. A 127.0.0.2
 body INTERSERVER_RULE_URIBL_RBLINT eval:check_uridnsbl('URIBL_RBLINT')
 describe INTERSERVER_RULE_URIBL_RBLINT Contains a URL listed in the uribl at sigs.interserver.net
@@ -21,6 +28,8 @@ score INTERSERVER_RULE_URIBL_RBLINT 4.0
 # end int uri
 
 #wl
+# known list of good ips / good networks / known good smtp servers
+# the score should be reduced, but not a blanket accept all emails
 header   INTERSERVER_RULE_GOOD_NETWORK rbleval:check_rbl('int', 'goodrbl.interserver.net.')
 describe INTERSERVER_RULE_GOOD_NETWORK Good or wellknown network decrease score by 2.1
 tflags   INTERSERVER_RULE_GOOD_NETWORK net

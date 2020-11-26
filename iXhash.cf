@@ -27,16 +27,19 @@ tflags          NIXSPAM_IXHASH net
 # adjust as you seem fit
 score           NIXSPAM_IXHASH 4.0
 
+# hashes appear in more than 25 emails or spam traps
 body            MAILBABY_IXHASH eval:ixhashtest('mailbaby.ixhash.interserver.net')
 describe        MAILBABY_IXHASH iXhash found @ mailbaby.ixhash.interserver.net
 tflags          MAILBABY_IXHASH net
 # adjust as you seem fit
-score           MAILBABY_GENERIC_IXHASH 4.0
+score           MAILBABY_IXHASH 4.0
 
+
+# generic contains hashes that have appeared in 5 spam emails but less than 25
 body            MAILBABY_GENERIC_IXHASH eval:ixhashtest('mailbaby.ixhashgeneric.interserver.net')
 describe        MAILBABY_GENERIC_IXHASH iXhash found @ mailbaby.ixhashgeneric.interserver.net
 tflags          MAILBABY_GENERIC_IXHASH net
 # adjust as you seem fit
-score           MAILBABY_IXHASH 1.0
+score           MAILBABY_GENERIC_IXHASH 1.0
 
 
