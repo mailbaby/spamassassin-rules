@@ -73,7 +73,7 @@ sub new {
 
 sub set_config {
     my ($self, $conf) = @_;
-
+    
     my @settings = (
         { setting => 'ixhash_timeout', default => 10, type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC },
         { setting => 'use_ixhash_cache', default => 0, type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC },
@@ -81,7 +81,7 @@ sub set_config {
         { setting => 'ixhash_tr_path', type => $Mail::SpamAssassin::Conf::CONF_TYPE_STRING },
         { setting => 'ixhash_md5sum_path', type => $Mail::SpamAssassin::Conf::CONF_TYPE_STRING }
     );
-
+    
     $conf->{parser}->register_commands(\@settings);
 }
 
@@ -90,8 +90,8 @@ sub ixhashtest {
     my ($self, $msg_status, @dnszone) = @_;
 
     my $dnszone = join('', grep { defined && !ref($_) } @dnszone);
-    $dnszone =~ s/[^a-zA-Z0-9.-]//g;
-    $dnszone =~ s/\s+//g;
+    $dnszone =~ s/[^a-zA-Z0-9.-]//g; 
+    $dnszone =~ s/\s+//g;            
 
     dbg("IXHASH: ixhashtest() called with DNS zone '$dnszone'");
 
@@ -113,7 +113,7 @@ sub ixhashtest {
         dbg("IXHASH: Computed digest (Method #" . ($i + 1) . "): $digest");
         $hash_used++;
         my $result = query_dns_for_hash($digest, $dnszone, $resolver);
-
+        
         if ($result) {
             dbg("IXHASH: Hash matched in DNSBL ($digest) - Method #" . ($i + 1) . ")");
             return 1;
@@ -131,11 +131,11 @@ sub ixhashtest {
 sub get_cached_or_compute_hash {
     my ($msg_status, $body, $method_number, $compute_sub) = @_;
     my $key = "X-iXhash-hash-$method_number";
-
+    
     if ($msg_status->{main}->{conf}->{use_ixhash_cache} && $msg_status->{msg}->get_metadata($key)) {
         return $msg_status->{msg}->get_metadata($key);
     }
-
+    
     my $digest = $compute_sub->($body);
     $msg_status->{msg}->put_metadata($key, $digest) if $msg_status->{main}->{conf}->{use_ixhash_cache};
     return $digest;
@@ -219,14 +219,13 @@ sub compute3rdhash {
     }
 
     my $body_copy = $body;
-
-    # Remove control characters and spaces (Same as before)
     $body_copy =~ s/[[:cntrl:][:space:]=]+//g;
 
-    # Ensure Method #3 does NOT generate the same hash as Method #2
     my $digest = md5_hex($body_copy);
 
-    if ($digest eq compute2ndhash($body)) {
+    # Prevent duplicate hashing with Method #2
+    my $hash2 = compute2ndhash($body);
+    if (defined $hash2 && $digest eq $hash2) {
         dbg("IXHASH: Skipping Hash #3 - Duplicate of Method #2");
         return undef;
     }
@@ -234,5 +233,6 @@ sub compute3rdhash {
     dbg("IXHASH: Computed Hash #3: $digest");
     return $digest;
 }
+
 
 1;
